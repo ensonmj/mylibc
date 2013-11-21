@@ -1,7 +1,8 @@
 # Default target.
 all: lib dll
 
-CFLAGS = -std=gnu99 -Wall -Werror -g -O2 -fPIC -pthread
+CFLAGS = -std=gnu99 -Wall -Werror -g -O2 -fPIC
+LDFLAGS = -shared -pthread
 
 src = ringbuffer.c
 objs = $(src:.c=.o)
@@ -11,17 +12,17 @@ objs = $(src:.c=.o)
 $(objs): %.o:%.c
 	$(CC) -c $(CFLAGS) -o $@ $<
 
+lib: $(objs)
+	ar crv libmyc.a $(objs)
+
+dll: $(objs)
+	$(CC) $(LDFLAGS) -o libmyc.so $(objs)
+
 %.d: %.c
 	set -e; rm -f $@; \
 	    $(CC) -MM $(CFLAGS) $< > $@.$$$$; \
 	    sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	    rm -rf $@.$$$$
-
-lib: $(objs)
-	ar crv libmyc.a $(objs)
-
-dll: $(objs)
-	gcc -shared -o libmyc.so $(objs)
 
 clean:
 	rm -f *.d *.o libmyc.a libmyc.so
