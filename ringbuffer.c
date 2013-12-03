@@ -1,14 +1,38 @@
 #include <unistd.h>
+#include <stdlib.h>
 #include "ringbuffer.h"
 
-void ringbuf_init(void *buf, uint32_t entry_size, uint32_t entries)
+ringbuf_t *ringbuf_init(void *buf, uint32_t entry_size, uint32_t entries)
 {
+    ringbuf_t *rb = malloc(sizeof(ringbuf_t));
+    if(rb == NULL)
+        return NULL;
 
+    rb->buf = buf;
+    rb->entry_size = entry_size;
+    rb->entries = entries;
+    rb->head = rb->tail = 0;
+    rb->shutdown = 0;
+    pthread_spin_init(&rb->spin, 0);
+
+#ifdef RINGBUFFER_MUTEX_WAIT
+    pthread_mutex_init(&rb->mutex, NULL);
+    pthread_cond_init(&rb->cond, NULL);
+#endif
+
+    return rb;
 }
 
 void ringbuf_cleanup(ringbuf_t *rb)
 {
+    pthread_spin_destroy(&rb->spin);
 
+#ifdef RINGBUFFER_MUTEX_WAIT
+    pthread_mutex_destroy(&rb->mutex);
+    pthread_cond_destroy(&rb->cond);
+#endif
+
+    free(rb);
 }
 
 static inline void ringbuf_wait(ringbuf_t *rb)

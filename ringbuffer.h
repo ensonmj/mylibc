@@ -22,7 +22,7 @@ typedef struct ringbuf_ {
     volatile uint32_t shutdown;
 } ringbuf_t;
 
-void ringbuf_init(void *buf, uint32_t entry_size, uint32_t entries);
+ringbuf_t *ringbuf_init(void *buf, uint32_t entry_size, uint32_t entries);
 void ringbuf_cleanup(ringbuf_t *rb);
 
 void *ringbuf_get(ringbuf_t *rb);
