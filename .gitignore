@@ -1,3 +1,6 @@
+*
+!*.*
+
 # Object files
 *.o
 *.ko
@@ -21,3 +24,4 @@
 *.swp
 *.swo
 *.swn
+*.d
