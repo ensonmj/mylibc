@@ -1,8 +1,16 @@
 all: test
 
 CC = clang
-CFLAGS = -std=gnu99 -Wall -Werror -g -O2 -fPIC
+CPPFLAGS =
+CFLAGS = -std=gnu99 -Wall -Werror -g -O0 -fPIC
 LDFLAGS =
+
+ifdef TEST_SORT
+CPPFLAGS = -DTEST_SORT
+else ifdef TEST_LUA
+CPPFLAGS = -DTEST_LUA
+LDFLAGS = -llua
+endif
 
 SRCS = $(wildcard *.c)
 OBJS = $(SRCS:.c=.o)
@@ -10,7 +18,7 @@ OBJS = $(SRCS:.c=.o)
 -include $(SRCS:.c=.d)
 
 $(OBJS): %.o:%.c
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
 
 test: $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $^
